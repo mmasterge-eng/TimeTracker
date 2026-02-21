@@ -130,6 +130,37 @@ fi
 echo
 echo "4. Configuring app to use Python at $PYTHON..."
 
+# Find the Python framework executable (required for macOS menu bar / AppKit access)
+# macOS requires the framework Python (inside Python.app) to show menu bar icons
+FRAMEWORK_PYTHON=$("$PYTHON" -c "
+import sys, os, glob
+exe = os.path.realpath(sys.executable)
+# Try to locate the framework Python.app from the Cellar path
+# e.g. /opt/homebrew/Cellar/python@3.x/3.x.y/Frameworks/Python.framework/...
+parts = exe.split('/')
+for i, p in enumerate(parts):
+    if p == 'Cellar':
+        prefix = '/'.join(parts[:i+3])  # up to version dir
+        pattern = prefix + '/Frameworks/Python.framework/Versions/*/Resources/Python.app/Contents/MacOS/Python'
+        matches = glob.glob(pattern)
+        if matches:
+            print(sorted(matches)[-1])
+            exit()
+# Fallback: check opt/homebrew framework path
+ver = f'{sys.version_info.major}.{sys.version_info.minor}'
+fw = f'/opt/homebrew/opt/python@{ver}/Frameworks/Python.framework/Versions/{ver}/Resources/Python.app/Contents/MacOS/Python'
+if os.path.isfile(fw):
+    print(fw)
+else:
+    print(exe)
+" 2>/dev/null)
+
+if [ -z "$FRAMEWORK_PYTHON" ] || [ ! -x "$FRAMEWORK_PYTHON" ]; then
+    FRAMEWORK_PYTHON="$PYTHON"
+fi
+
+echo "   ✓ Framework Python: $FRAMEWORK_PYTHON"
+
 LAUNCHER="$APP_SRC/Contents/MacOS/TimeTracker"
 cat > "$LAUNCHER" << LAUNCHER_EOF
 #!/bin/bash
@@ -138,10 +169,11 @@ cat > "$LAUNCHER" << LAUNCHER_EOF
 BUNDLE_DIR="\$(cd "\$(dirname "\$0")/../.." && pwd)"
 RESOURCES_DIR="\$BUNDLE_DIR/Contents/Resources"
 
-# Use the Python that was verified during installation
-PYTHON="$PYTHON"
+# Use the Python framework executable (required for macOS menu bar / AppKit)
+# The framework Python is needed so the process can connect to the window server
+PYTHON="$FRAMEWORK_PYTHON"
 
-# Fallback: search common locations if the above path is gone
+# Fallback to regular python3 if framework exe is missing
 if [ ! -x "\$PYTHON" ]; then
     for py in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
         if [ -x "\$py" ]; then

@@ -4,10 +4,11 @@
 BUNDLE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 RESOURCES_DIR="$BUNDLE_DIR/Contents/Resources"
 
-# Use the Python that was verified during installation
-PYTHON="/opt/homebrew/bin/python3"
+# Use the Python framework executable (required for macOS menu bar / AppKit)
+# The framework Python is needed so the process can connect to the window server
+PYTHON="/opt/homebrew/Cellar/python@3.14/3.14.3_1/Frameworks/Python.framework/Versions/Current/Resources/Python.app/Contents/MacOS/Python"
 
-# Fallback: search common locations if the above path is gone
+# Fallback to regular python3 if framework exe is missing
 if [ ! -x "$PYTHON" ]; then
     for py in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
         if [ -x "$py" ]; then

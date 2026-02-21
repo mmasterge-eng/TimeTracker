@@ -316,7 +316,7 @@ class TimeTrackerApp(rumps.App):
         self.running = False
         if self.tracker:
             self.tracker.close()
-        rumps.quit_app()
+        rumps.quit_application()
 
 
 def main():

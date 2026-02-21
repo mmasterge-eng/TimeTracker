@@ -1,44 +1,36 @@
 #!/bin/bash
-# Time Tracker - macOS App Launcher
-# This script is the entry point for the .app bundle
+# Time Tracker - macOS App Launcher (auto-configured by install_app.sh)
 
-# Find the directory where this script lives (inside the .app bundle)
 BUNDLE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 RESOURCES_DIR="$BUNDLE_DIR/Contents/Resources"
 
-# Find Python 3 - check common locations on macOS
-find_python() {
-    for py in \
-        /usr/bin/python3 \
-        /usr/local/bin/python3 \
-        /opt/homebrew/bin/python3 \
-        "$(which python3 2>/dev/null)"; do
+# Use the Python that was verified during installation
+PYTHON="/opt/homebrew/bin/python3"
+
+# Fallback: search common locations if the above path is gone
+if [ ! -x "$PYTHON" ]; then
+    for py in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
         if [ -x "$py" ]; then
-            echo "$py"
-            return 0
+            PYTHON="$py"
+            break
         fi
     done
-    return 1
-}
+fi
 
-PYTHON=$(find_python)
-
-if [ -z "$PYTHON" ]; then
-    osascript -e 'display alert "Time Tracker Error" message "Python 3 is not installed. Please install Python 3 from python.org to use Time Tracker." as critical'
+if [ -z "$PYTHON" ] || [ ! -x "$PYTHON" ]; then
+    osascript -e 'display alert "Time Tracker Error" message "Python 3.10+ not found. Please run install_app.sh again." as critical'
     exit 1
 fi
 
-# Check if rumps is installed; if not, install it
-"$PYTHON" -c "import rumps" 2>/dev/null
-if [ $? -ne 0 ]; then
-    # Show progress while installing
+# Install rumps if missing
+if ! "$PYTHON" -c "import rumps" 2>/dev/null; then
     osascript -e 'display notification "Installing Time Tracker dependencies..." with title "Time Tracker"'
-    "$PYTHON" -m pip install rumps --break-system-packages --quiet 2>/dev/null || \
-    "$PYTHON" -m pip install rumps --user --quiet 2>/dev/null
+    "$PYTHON" -m pip install rumps --quiet 2>/dev/null ||     "$PYTHON" -m pip install rumps --user --quiet 2>/dev/null ||     "$PYTHON" -m pip install rumps --break-system-packages --quiet 2>/dev/null
 fi
 
-# Kill any existing instance of the menu bar app
+# Kill any existing instance
 pkill -f "timetracker_menu.py" 2>/dev/null
+sleep 0.5
 
-# Launch the menu bar app from Resources
+# Launch menu bar app
 exec "$PYTHON" "$RESOURCES_DIR/timetracker_menu.py"

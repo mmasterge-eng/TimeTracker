@@ -25,6 +25,7 @@ class TimeTrackerApp(rumps.App):
 
     def __init__(self):
         super(TimeTrackerApp, self).__init__(
+            "Time Tracker",
             title="⏱️ 00:00:00",
             quit_button=None
         )
@@ -94,7 +95,10 @@ class TimeTrackerApp(rumps.App):
             # Project selection menu
             projects = self.tracker.project.list_all()
             if projects:
-                self.menu.add("Start Tracking", self._build_project_menu(projects))
+                start_menu = rumps.MenuItem("Start Tracking")
+                for item in self._build_project_menu(projects):
+                    start_menu.add(item)
+                self.menu.add(start_menu)
             else:
                 no_projects = rumps.MenuItem("No projects yet", callback=None)
                 self.menu.add(no_projects)
@@ -102,16 +106,22 @@ class TimeTrackerApp(rumps.App):
             self.menu.add(None)  # Separator
 
         # Reports submenu
-        self.menu.add("Reports", self._build_reports_menu())
+        reports_menu = rumps.MenuItem("Reports")
+        for item in self._build_reports_menu():
+            if item is None:
+                reports_menu.add(rumps.separator)
+            else:
+                reports_menu.add(item)
+        self.menu.add(reports_menu)
 
         # Management
         self.menu.add(None)  # Separator
-        self.menu.add("New Project", callback=self.new_project)
-        self.menu.add("Manage Projects", callback=self.manage_projects)
+        self.menu.add(rumps.MenuItem("New Project", callback=self.new_project))
+        self.menu.add(rumps.MenuItem("Manage Projects", callback=self.manage_projects))
 
         # Quit
         self.menu.add(None)  # Separator
-        self.menu.add("Quit", callback=self.quit_app)
+        self.menu.add(rumps.MenuItem("Quit", callback=self.quit_app))
 
     def _build_project_menu(self, projects):
         """Build submenu for project selection"""
@@ -306,7 +316,7 @@ class TimeTrackerApp(rumps.App):
         self.running = False
         if self.tracker:
             self.tracker.close()
-        rumps.quit_app()
+        rumps.quit_application()
 
 
 def main():

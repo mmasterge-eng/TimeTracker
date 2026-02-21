@@ -32,7 +32,7 @@
     <!-- LSUIElement = true means it runs as a menu bar app with NO dock icon -->
     <!-- Set to false if you want a Dock icon AND menu bar presence -->
     <key>LSUIElement</key>
-    <false/>
+    <true/>
 
     <key>NSHighResolutionCapable</key>
     <true/>

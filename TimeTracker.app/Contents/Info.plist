@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Time Tracker</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Time Tracker</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>com.mike.timetracker</string>
+
+    <key>CFBundleVersion</key>
+    <string>1.0.0</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <key>CFBundleExecutable</key>
+    <string>TimeTracker</string>
+
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+
+    <key>CFBundleSignature</key>
+    <string>TTCK</string>
+
+    <!-- LSUIElement = true means it runs as a menu bar app with NO dock icon -->
+    <!-- Set to false if you want a Dock icon AND menu bar presence -->
+    <key>LSUIElement</key>
+    <false/>
+
+    <key>NSHighResolutionCapable</key>
+    <true/>
+
+    <key>NSSupportsAutomaticTermination</key>
+    <false/>
+
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Mike. All rights reserved.</string>
+</dict>
+</plist>

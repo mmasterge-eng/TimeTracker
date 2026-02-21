@@ -1,0 +1,44 @@
+#!/bin/bash
+# Time Tracker - macOS App Launcher
+# This script is the entry point for the .app bundle
+
+# Find the directory where this script lives (inside the .app bundle)
+BUNDLE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+RESOURCES_DIR="$BUNDLE_DIR/Contents/Resources"
+
+# Find Python 3 - check common locations on macOS
+find_python() {
+    for py in \
+        /usr/bin/python3 \
+        /usr/local/bin/python3 \
+        /opt/homebrew/bin/python3 \
+        "$(which python3 2>/dev/null)"; do
+        if [ -x "$py" ]; then
+            echo "$py"
+            return 0
+        fi
+    done
+    return 1
+}
+
+PYTHON=$(find_python)
+
+if [ -z "$PYTHON" ]; then
+    osascript -e 'display alert "Time Tracker Error" message "Python 3 is not installed. Please install Python 3 from python.org to use Time Tracker." as critical'
+    exit 1
+fi
+
+# Check if rumps is installed; if not, install it
+"$PYTHON" -c "import rumps" 2>/dev/null
+if [ $? -ne 0 ]; then
+    # Show progress while installing
+    osascript -e 'display notification "Installing Time Tracker dependencies..." with title "Time Tracker"'
+    "$PYTHON" -m pip install rumps --break-system-packages --quiet 2>/dev/null || \
+    "$PYTHON" -m pip install rumps --user --quiet 2>/dev/null
+fi
+
+# Kill any existing instance of the menu bar app
+pkill -f "timetracker_menu.py" 2>/dev/null
+
+# Launch the menu bar app from Resources
+exec "$PYTHON" "$RESOURCES_DIR/timetracker_menu.py"

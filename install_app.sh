@@ -91,6 +91,8 @@ else
         echo "   ✓ rumps installed"
     elif "$PYTHON" -m pip install rumps --user --quiet 2>/dev/null; then
         echo "   ✓ rumps installed (user)"
+    elif "$PYTHON" -m pip install rumps --break-system-packages --quiet 2>/dev/null; then
+        echo "   ✓ rumps installed (system)"
     else
         echo "   ❌ Could not install rumps."
         echo "   Try manually: $PYTHON -m pip install rumps"
@@ -158,7 +160,8 @@ fi
 if ! "\$PYTHON" -c "import rumps" 2>/dev/null; then
     osascript -e 'display notification "Installing Time Tracker dependencies..." with title "Time Tracker"'
     "\$PYTHON" -m pip install rumps --quiet 2>/dev/null || \
-    "\$PYTHON" -m pip install rumps --user --quiet 2>/dev/null
+    "\$PYTHON" -m pip install rumps --user --quiet 2>/dev/null || \
+    "\$PYTHON" -m pip install rumps --break-system-packages --quiet 2>/dev/null
 fi
 
 # Kill any existing instance
